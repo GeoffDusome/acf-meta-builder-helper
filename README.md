@@ -102,7 +102,7 @@ Whether or not the group has more than 1 level of meta (if the group contains a 
 
 ## Example
 
-If you have both the ACF Meta Builder gulp task as well as the ACF Meta Builder WordPress plugin below is an example of the typical workflow of building meta.
+If you have both the [ACF Meta Builder gulp task](https://github.com/GeoffDusome/acf-meta-builder) as well as the ACF Meta Builder WordPress plugin below is an example of the typical workflow of building meta.
 
 ```
 // Create a tab
