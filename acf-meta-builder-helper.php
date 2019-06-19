@@ -242,12 +242,12 @@ function acfmb_get_multi_level_meta($meta)
 }
 
 /**
- * acfmb_repeater($value, $name)
+ * acfmb_repeater($name, $return = false)
  * 
  * outputs markup from a part file or returns data
  *
  * @param string $name [required] the name of your repeater in the same casing as when you defined it
- * @param string $return [required] expects null or the amount of rows in your repeater
+ * @param string $return [required] whether or not to return the data generated or show the view from a part file
  */
 function acfmb_repeater($name, $return = false)
 {
