@@ -30,8 +30,24 @@ else if ( file_exists( ACFMBH_ACF_PATH . 'acf.php' ) )
 	include_once( ACFMBH_ACF_PATH . 'acf.php' );
 }
 
+// define global $acfmb_page_meta array
 $acfmb_page_meta = array();
 
+/**
+ * acfmbh_global_meta_variable()
+ * 
+ * get global post variable and setup global $acfmb_page_meta variable
+ */
+function acfmbh_global_meta_variable()
+{
+	global $post;
+	global $acfmb_page_meta;
+
+	$acfmb_page_meta = get_post_meta($post->ID);
+}
+add_action('wp_head', 'acfmbh_global_meta_variable');
+
+// if ACF exists, add the local field groups (we can't do this if ACF isn't added)
 if ( function_exists('acf_add_local_field_group') )
 {
 	$current_meta = acfmbh_get_meta_structure();
@@ -44,15 +60,11 @@ if ( function_exists('acf_add_local_field_group') )
 	}
 }
 
-function acfmbh_global_meta_variable()
-{
-	global $post;
-	global $acfmb_page_meta;
-
-	$acfmb_page_meta = get_post_meta($post->ID);
-}
-add_action('wp_head', 'acfmbh_global_meta_variable');
-
+/**
+ * acfmbh_get_meta_structure()
+ * 
+ * Pull acf JSON file for adding a local field group
+ */
 function acfmbh_get_meta_structure()
 {
 	if ( file_exists( get_template_directory().'/acf-json/acf-meta.json') )
@@ -234,18 +246,20 @@ function acfmb_get_multi_level_meta($meta)
  * 
  * outputs markup from a part file or returns data
  *
- * @param string $value [required] expects null or the amount of rows in your repeater
  * @param string $name [required] the name of your repeater in the same casing as when you defined it
+ * @param string $return [required] expects null or the amount of rows in your repeater
  */
-function acfmb_repeater($value, $name, $return = false)
+function acfmb_repeater($name, $return = false)
 {
 	global $acfmb_page_meta;
+
 	$repeater_data = array();
+
 	$name = sanitize_title($name);
+
 	if ( ! array_key_exists($name, $acfmb_page_meta) )
 	{
 		global $post;
-		$value = get_post_meta($post->ID, $name, true);
 		$post_meta = get_post_meta($post->ID);
 
 		$data = array();
@@ -290,12 +304,15 @@ function acfmb_repeater($value, $name, $return = false)
 function acfmb_group($name, $has_sub_meta = false)
 {
 	global $acfmb_page_meta;
+
 	$group_data = array();
+
 	$name = sanitize_title($name);
 
 	if ( ! array_key_exists($name, $acfmb_page_meta) )
 	{
 		global $post;
+
 		$post_meta = get_post_meta($post->ID);
 
 		if ( $has_sub_meta )
