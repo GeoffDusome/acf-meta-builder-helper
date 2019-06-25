@@ -12,7 +12,7 @@ Clone or download the plugin and upload entire folder to your WordPress installa
 
 ## Usage
 
-The helper plugin uses a `get_post_meta($post->ID)` call to pull **all** of the meta for the page. It will then use that meta array to pull from. This allows us to have all of our meta for the page with one call to the DB, instead of one for every meta call.
+The helper plugin uses a `get_post_meta($post->ID)` call to pull **all** of the meta for the page. It will then use that meta array to pull from. This allows us to have all of our meta for the page with one call to the DB, instead of one for every meta call. **Please note** that for repeater, group and flexible content field types, you will need to use base ACF functions to get this data (`$repeater_data = get_field('repeater_name');` should do all you need).
 
 ### acfmb($type, $name, $group, $options)
 
