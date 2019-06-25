@@ -96,21 +96,17 @@ function acfmb($type, $name, $group, $options = false)
 	global $acfmb_page_meta;
 
 	// Get slug from the field name
-	$slug = sanitize_title($name);
+	$slug = str_replace( '-', '_', sanitize_title($name) );
 
-	// return the value
-	if ( $type !== 'tab' && $type !== 'group' )
+	// if we don't get the data from $acfmb_page_meta, get it manually
+	if ( ! array_key_exists($slug, $acfmb_page_meta) )
 	{
-		// if we don't get the data from $acfmb_page_meta, get it manually
-		if ( ! array_key_exists($slug, $acfmb_page_meta) )
-		{
-			global $post;
-			return get_post_meta($post->ID, $slug, true);
-		} 
-		else
-		{
-			return $acfmb_page_meta[$slug][0];
-		}
+		global $post;
+		return get_post_meta($post->ID, $slug, true);
+	} 
+	else
+	{
+		return $acfmb_page_meta[$slug][0];
 	}
 }
 
@@ -199,164 +195,4 @@ function acfmb_true_false($value)
 	{
 		return false;
 	}
-}
-
-/**
- * acfmb_get_multi_level_meta($meta)
- * 
- * creates a multi-level array containing the meta of repeaters that have sub repeaters or groups
- *
- * @param array $meta [required] expects an array of meta key => value pairs
- * @return array $return_array returns a multi-level array containing the meta split into sub arrays
- */
-function acfmb_get_multi_level_meta($meta)
-{
-	$return_array = array();
-
-	$return_array =& $target_ref;
-
-	foreach ( $meta as $key => $value )
-  	{
-  		$key_parts = explode('_', $key);
-
-  		$target_ref =& $return_array;
-
-		for ( $i = 0; $i < count( $key_parts ); $i++ )
-		{
-			$key_part = ( ! is_numeric( $key_parts[$i] ) ) ? $key_parts[$i] : intval( $key_parts[$i] );
-
-			if ( ( $i == ( count( $key_parts ) - 1 ) ) && ( ! isset( $target_ref[$key_part] ) ) )
-			{
-				$target_ref[$key_part] = $value;
-			}
-			else if ( ! isset( $target_ref[$key_part] ) )
-			{
-				$target_ref[$key_part] = array();
-			}
-
-			$target_ref =& $target_ref[$key_part];
-		}
-  	}
-
-  	return $return_array;
-}
-
-/**
- * acfmb_repeater($name, $return = false)
- * 
- * outputs markup from a part file or returns data
- *
- * @param string $name [required] the name of your repeater in the same casing as when you defined it
- * @param string $return [required] whether or not to return the data generated or show the view from a part file
- */
-function acfmb_repeater($name, $return = false)
-{
-	global $acfmb_page_meta;
-
-	$repeater_data = array();
-
-	$name = sanitize_title($name);
-
-	if ( ! array_key_exists($name, $acfmb_page_meta) )
-	{
-		global $post;
-		$post_meta = get_post_meta($post->ID);
-
-		$data = array();
-		$keys = preg_grep('/^'.$name.'_/', array_keys($post_meta));
-		foreach ( $keys as $key )
-		{
-			$data[$key] = $post_meta[$key][0];
-		}
-		$repeater_data = acfmb_get_multi_level_meta($data);
-	}
-	else
-	{
-		$data = array();
-		$keys = preg_grep('/^'.$name.'_/', array_keys($acfmb_page_meta));
-		foreach ( $keys as $key )
-		{
-			$data[$key] = $acfmb_page_meta[$key][0];
-		}
-		$repeater_data = acfmb_get_multi_level_meta($data);
-	}
-
-	if ( $return )
-	{
-		return $repeater_data;
-	}
-	else
-	{
-		// set a query var to send to our template part
-		set_query_var( 'repeater_data', $repeater_data );
-		get_template_part( 'parts/repeater', $name );
-	}
-}
-
-/**
- * acfmb_group($name)
- * 
- * returns data for use on template files
- *
- * @param string $name [required] the name of your group in the same casing as when you defined it
- * @param bool $has_sub_meta whether or not the group has more than 1 level of meta
- */
-function acfmb_group($name, $has_sub_meta = false)
-{
-	global $acfmb_page_meta;
-
-	$group_data = array();
-
-	$name = sanitize_title($name);
-
-	if ( ! array_key_exists($name, $acfmb_page_meta) )
-	{
-		global $post;
-
-		$post_meta = get_post_meta($post->ID);
-
-		if ( $has_sub_meta )
-		{
-			$data = array();
-			$keys = preg_grep('/^'.$name.'_/', array_keys($post_meta));
-			foreach ( $keys as $key_value => $key )
-			{
-				$data[$key] = $post_meta[$key][0];
-			}
-
-			$group_data = acfmb_get_multi_level_meta($data);
-		}
-		else
-		{
-			$keys = preg_grep('/^'.$name.'_/', array_keys($post_meta));
-			foreach ( $keys as $key_value => $key )
-			{
-				$group_data[str_replace($name.'_', '', $key)] = $post_meta[$key][0];
-			}
-		}
-	}
-	else
-	{
-		if ( $has_sub_meta )
-		{
-			$data = array();
-			$keys = preg_grep('/^'.$name.'_/', array_keys($acfmb_page_meta));
-			foreach ( $keys as $key_value => $key )
-			{
-				$data[$key] = $acfmb_page_meta[$key][0];
-			}
-
-			$group_data = acfmb_get_multi_level_meta($data);
-		}
-		else 
-		{
-			$keys = preg_grep('/^'.$name.'_/', array_keys($acfmb_page_meta));
-			foreach ( $keys as $key_value => $key )
-			{
-				$group_data[str_replace($name.'_', '', $key)] = $acfmb_page_meta[$key][0];
-			}
-		}
-	}
-
-	return $group_data;
 }

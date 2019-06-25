@@ -77,29 +77,6 @@ Return a boolean value instead for a true/false field.
 **[required]**  
 Expects a '0' or '1' to return a bool.
 
-### acfmb_repeater($name, $return = false)
-
-Outputs markup from a part file or returns data. If `$return` is set to false, this function will look for a part file in `{theme}/parts/` with the name `repeater-{name-slug}.php`. Otherwise, the data will be returned in an array to the location the function was called.
-
-**$name** - string  
-**[required]**  
-The name of your repeater in the same casing as when you defined it in your `acfmb()` function call.
-
-**$return** - bool  
-**[required]**  
-Whether or not to return the data generated or show the view from a part file.
-
-### acfmb_group($name, $has_sub_meta = false)
-
-Returns data for use on template files for ACF group fields.
-
-**$name** - string  
-**[required]**  
-The name of your group in the same casing as when you defined it.
-
-**$has_sub_meta** - bool  
-Whether or not the group has more than 1 level of meta (if the group contains a repeater or another group). If you're unsure, always set this to true to have this function work the same as the `acfmb_repeater()` function.
-
 ## Example
 
 If you have both the [ACF Meta Builder gulp task](https://github.com/GeoffDusome/acf-meta-builder) as well as the ACF Meta Builder WordPress plugin below is an example of the typical workflow of building meta.
