@@ -94,19 +94,41 @@ function acfmb($type, $name, $group, $options = false)
 {
 	// Get global meta array
 	global $acfmb_page_meta;
+	global $post;
 
 	// Get slug from the field name
 	$slug = str_replace( '-', '_', sanitize_title($name) );
 
-	// if we don't get the data from $acfmb_page_meta, get it manually
-	if ( ! array_key_exists($slug, $acfmb_page_meta) )
+	// return the value
+	if ( $type !== 'tab' && $type !== 'group' && $type !== 'repeater' )
 	{
-		global $post;
-		return get_post_meta($post->ID, $slug, true);
-	} 
-	else
-	{
-		return $acfmb_page_meta[$slug][0];
+		if ( $type === 'link' || $type === 'gallery' || $type === 'checkbox' || $type === 'relationship' || $type === 'taxonomy' )
+		{
+			return ( array_key_exists($slug, $acfmb_page_meta) ) ? unserialize($acfmb_page_meta[$slug][0]) : unserialize(get_post_meta($post->ID, $slug, true));
+		}
+		else if ( $type === 'post_object' || $type === 'page_link' || $type === 'user' || $type === 'select' )
+		{
+			if ( isset( json_decode($options)->multiple ) )
+			{
+				return ( array_key_exists($slug, $acfmb_page_meta) ) ? unserialize($acfmb_page_meta[$slug][0]) : unserialize(get_post_meta($post->ID, $slug, true));
+			}
+			else
+			{
+				return ( array_key_exists($slug, $acfmb_page_meta) ) ? $acfmb_page_meta[$slug][0] : get_post_meta($post->ID, $slug, true);
+			}
+		}
+		else if ( $type === 'textarea' )
+		{
+			return ( array_key_exists($slug, $acfmb_page_meta) ) ? wpautop( $acfmb_page_meta[$slug][0], true ) : wpautop( get_post_meta($post->ID, $slug, true), true );
+		}
+		else if ( $type === 'oembed' )
+		{
+			return ( array_key_exists($slug, $acfmb_page_meta) ) ? wp_oembed_get($acfmb_page_meta[$slug][0]) : wp_oembed_get(get_post_meta($post->ID, $slug, true));
+		}
+		else
+		{
+			return ( array_key_exists($slug, $acfmb_page_meta) ) ? $acfmb_page_meta[$slug][0] : get_post_meta($post->ID, $slug, true);
+		}
 	}
 }
 
@@ -125,22 +147,6 @@ function acfmb_image_url($value, $size = 'full')
 
 	// return the image url if it exists
     return ( isset($img[0]) ) ? $img[0] : '';
-}
-
-/**
- * acfmb_link($value)
- * 
- * get the link object array for display on the front end
- *
- * @param string $value [required] json encoded array from db
- */
-function acfmb_link($value)
-{
-	// get link object
-	$link_obj = unserialize($value);
-
-	// return link object
-	return $link_obj;
 }
 
 /**
@@ -175,24 +181,4 @@ function acfmb_link_markup($value, $classes = '', $wrapper = false, $unserialize
 	}
 
 	return $output;
-}
-
-/**
- * acfmb_true_false($value)
- * 
- * return a boolean value instead for a true/false field
- *
- * @param string $value [required] expects a '0' or '1' to return a bool
- */
-function acfmb_true_false($value)
-{
-	// return bool value instead of 0 or 1
-	if ( $value === '1' )
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
 }

@@ -44,14 +44,6 @@ The ID of the image
 **$size** - string  
 The defined image size of the image you want to display.
 
-### acfmb_link($value)
-
-Get the link object array (using `unserialize()`) for display on the front end.
-
-**$value** - string  
-**[required]**  
-JSON encoded array from DB.
-
 ### acfmb_link_markup($value, $classes, $wrapper)
 
 Get the link object and provide markup for the button
@@ -69,14 +61,6 @@ Whether or not to show the wrapper for the button.
 **$unserialize** - bool  
 Whether or not to unserialize the data given to the function.
 
-### acfmb_true_false($value)
-
-Return a boolean value instead for a true/false field.
-
-**$value** - string  
-**[required]**  
-Expects a '0' or '1' to return a bool.
-
 ## Example
 
 If you have both the [ACF Meta Builder gulp task](https://github.com/GeoffDusome/acf-meta-builder) as well as the ACF Meta Builder WordPress plugin below is an example of the typical workflow of building meta.
@@ -91,8 +75,4 @@ $hero_background = acfmb_image_url($hero_background_id, 'large');
 
 // Create a text field
 $hero_headline = acfmb('text', 'Hero Headline', 'Page Meta');
-
-// Create a link field
-$hero_button_obj = acfmb('link', 'Hero Button', 'Page Meta');
-$hero_button = acfmb_link($hero_button_obj);
 ```
