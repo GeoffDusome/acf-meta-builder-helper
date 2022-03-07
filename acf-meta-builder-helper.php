@@ -104,7 +104,16 @@ function acfmb($type, $name, $group, $options = false)
 	{
 		if ( $type === 'link' || $type === 'gallery' || $type === 'checkbox' || $type === 'relationship' || $type === 'taxonomy' )
 		{
-			return ( array_key_exists($slug, $acfmb_page_meta) ) ? unserialize($acfmb_page_meta[$slug][0]) : unserialize(get_post_meta($post->ID, $slug, true));
+			if ( is_array($acfmb_page_meta) && array_key_exists($slug, $acfmb_page_meta) )
+			{
+				$meta = $acfmb_page_meta[$slug][0];
+				return ( ! is_array( $meta ) ) ? ( ( unserialize( $meta ) !== false ) ? unserialize( $meta ) : $meta ) : $meta;
+			}
+			else
+			{
+				$meta = get_post_meta($post->ID, $slug, true);
+				return ( ! is_array( $meta ) ) ? ( ( unserialize( $meta ) !== false ) ? unserialize( $meta ) : $meta ) : $meta;
+			}
 		}
 		else if ( $type === 'post_object' || $type === 'page_link' || $type === 'user' || $type === 'select' )
 		{
@@ -127,7 +136,7 @@ function acfmb($type, $name, $group, $options = false)
 		}
 		else
 		{
-			return ( array_key_exists($slug, $acfmb_page_meta) ) ? $acfmb_page_meta[$slug][0] : get_post_meta($post->ID, $slug, true);
+			return ( is_array( $acfmb_page_meta ) && array_key_exists($slug, $acfmb_page_meta) ) ? $acfmb_page_meta[$slug][0] : get_post_meta($post->ID, $slug, true);
 		}
 	}
 }
